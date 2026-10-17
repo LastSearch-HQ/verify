@@ -17,6 +17,7 @@ Options
   --fast            quick triage
   --max <n>         max claims (default 20)
   --json            machine-readable output
+  --verbose         show every source the verifier judged, with scores
   --help
 
 Keyless use is rate-limited. Free key: https://lastsearch.ai → export LASTSEARCH_API_KEY=ls_...
@@ -28,6 +29,7 @@ async function main() {
   if (args[0] === "mcp") { await import("./mcp.js"); return; }
   if (args[0] === "setup") { const m = await import("./setup.js"); await m.runSetup(args.slice(1)); return; }
   const json = args.includes("--json");
+  const verbose = args.includes("--verbose") || args.includes("-v");
   const fast = args.includes("--fast");
   const mi = args.indexOf("--max"); const maxClaims = mi >= 0 ? Number(args[mi + 1]) : 20;
   const positional = args.filter((a, i) => !a.startsWith("--") && !(i > 0 && args[i - 1] === "--max"));
@@ -51,7 +53,7 @@ async function main() {
   } catch (e) { console.error(`✗ ${(e as Error).message}`); process.exit(2); }
 
   if (json) { console.log(JSON.stringify(result, null, 2)); }
-  else { console.log(render(result, label)); }
+  else { console.log(render(result, label, verbose)); }
   const bad = result.claims.filter((c) => c.status === "contradicted").length;
   process.exit(bad > 0 ? 1 : 0);
 }

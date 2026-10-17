@@ -1,16 +1,34 @@
 # verify — is this true?
 
 ```
-npx verify-anything "The Eiffel Tower was completed in 1889 and is located in Berlin."
+npx verify-anything "The Eiffel Tower is located in Berlin. It is 330 metres tall and was completed in 1889. Apollo 13 landed on the Moon in 1969."
 ```
 
 ```
-✓ The Eiffel Tower was completed in 1889.       ██████████ 95%  Verified by 3 sources
-✗ The Eiffel Tower is located in Berlin.        █░░░░░░░░░  8%  Source contains explicit negation
-  ↳ https://en.wikipedia.org/wiki/Eiffel_Tower
+✗ The Eiffel Tower is located in Berlin.
+   █░░░░░░░░░ 10%  Evidence contradicts the claim (en.wikipedia.org +1)
+   ↳ https://en.wikipedia.org/wiki/Eiffel_Tower
+   “The Eiffel Tower is a lattice tower on the Champ de Mars in Paris, France.”
 
-Verdict: 1 ✓  1 ✗  0 ?   1 contradicted
+✓ The Eiffel Tower is 330 meters tall.
+   ████████░░ 77%  Directly supported by 1 source (single source)
+   ↳ https://en.wikipedia.org/wiki/Eiffel_Tower
+   “Eiffel Tower. Height Architectural 300 m (984 ft) Tip 330 m (1,083 ft)”
+
+✓ The Eiffel Tower was completed in 1889.
+   ████████░░ 80%  Directly supported by 1 source (single source)
+   ↳ https://en.wikipedia.org/wiki/Eiffel_Tower
+   “Eiffel Tower. Construction started 28 January 1887 … Completed 31 March 1889”
+
+✗ Apollo 13 landed on the Moon in 1969.
+   █░░░░░░░░░ 10%  Date mismatch — the claim's date does not match the source
+   ↳ https://en.wikipedia.org/wiki/Apollo_13
+
+Verdict: 2 ✓  2 ✗  0 ?   2 contradicted
 ```
+
+*(Real output, 2026-10-17, `--thorough`. The quoted line under each verdict is the exact span the
+verifier judged — so you can check the check. `--verbose` prints every source it weighed.)*
 
 Every AI answer, every page an agent reads, every claim in a doc — **nobody can tell what's true.**
 `verify` takes any input, extracts every factual claim, and judges each one against live web
@@ -32,6 +50,7 @@ npx verify-anything "<text>"            # a claim or paragraph (50+ chars)
 npx verify-anything https://example.com # a page
 npx verify-anything report.md           # a file
 pbpaste | npx verify-anything           # whatever's on your clipboard
+npx verify-anything ... --verbose       # every source judged, with entailment / contradiction scores
 npx verify-anything ... --json          # machine-readable; exit code 1 if anything is contradicted
 ```
 
