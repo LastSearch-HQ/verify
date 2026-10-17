@@ -1,17 +1,52 @@
 {
   "name": "verify-anything",
   "version": "0.1.0",
-  "description": "Is this true? Verify any claim, URL, file, or AI answer — every claim judged with live sources, confidence, and a signed evidence receipt. CLI + MCP server.",
+  "description": "Is this true? Verify any claim, URL, file, or AI answer \u2014 every claim judged against live sources, with confidence, the exact evidence span, and the reason. CLI + MCP server.",
   "type": "module",
-  "bin": { "verify": "dist/cli.js" },
+  "bin": {
+    "verify": "dist/cli.js"
+  },
   "main": "dist/index.js",
-  "files": ["dist", "README.md", "LICENSE"],
-  "scripts": { "build": "tsc", "dev": "tsx src/cli.ts", "prepublishOnly": "npm run build" },
-  "engines": { "node": ">=20" },
-  "keywords": ["fact-check", "verification", "ai", "agents", "mcp", "hallucination", "citations", "truth", "llm", "claude", "chatgpt", "cursor"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "fact-check",
+    "verification",
+    "ai",
+    "agents",
+    "mcp",
+    "hallucination",
+    "citations",
+    "truth",
+    "llm",
+    "claude",
+    "chatgpt",
+    "cursor"
+  ],
   "license": "Apache-2.0",
-  "repository": { "type": "git", "url": "https://github.com/LastSearch-HQ/verify.git" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LastSearch-HQ/verify.git"
+  },
   "homepage": "https://lastsearch.ai",
-  "dependencies": { "@modelcontextprotocol/sdk": "^1.12.0", "zod": "^3.23.0" },
-  "devDependencies": { "typescript": "^5.6.0", "tsx": "^4.19.0", "@types/node": "^22.0.0" }
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
 }
