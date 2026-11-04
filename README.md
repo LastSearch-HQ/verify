@@ -1,7 +1,7 @@
 # verify — is this true?
 
 ```
-npx verify-anything "The Eiffel Tower is located in Berlin. It is 330 metres tall and was completed in 1889. Apollo 13 landed on the Moon in 1969."
+npx verify-anything@0.2.0 "The Eiffel Tower is located in Berlin. It is 330 metres tall and was completed in 1889. Apollo 13 landed on the Moon in 1969."
 ```
 
 ```
@@ -31,37 +31,47 @@ Verdict: 2 ✓  2 ✗  0 ?   2 contradicted
 verifier judged — so you can check the check. `--verbose` prints every source it weighed.)*
 
 Every AI answer, every page an agent reads, every claim in a doc — **nobody can tell what's true.**
-`verify` takes any input, extracts every factual claim, and judges each one against live web
-evidence: **verified / contradicted / unverified**, with confidence, the source, and the reason.
+`verify` takes any input, extracts up to 20 factual claims (configurable with `--max`, up to 50),
+and judges each one against web evidence: **verified / contradicted / unverified**, with
+confidence, the source, and the reason.
 
 - **Any input** — a sentence, a paragraph, a URL, a file, or `stdin` (paste a ChatGPT answer)
 - **Every agent** — `verify mcp` exposes a `verify` tool; `verify setup` adds it to Claude Desktop,
-  Claude Code, Cursor, Windsurf, Codex and Gemini CLI in one command. Your agent gets a conscience:
+  Claude Code, Cursor, Windsurf and Gemini CLI in one command. Your agent gets a conscience:
   *verify before you answer.*
-- **Real verification, not vibes** — claim-level NLI entailment against fetched sources, cross-source
-  consensus, contradiction detection, live citation checks. Powered by the open
-  [LastSearch](https://lastsearch.ai) engine.
+- **Evidence, not vibes** — claim-level NLI entailment against fetched sources, cross-source
+  consensus and contradiction detection (live citation checks on deeper keyed runs). Powered by
+  the [LastSearch](https://lastsearch.ai) verification API.
 - **Honest** — confidence is an evidence-based estimate, not a guarantee; sources are shown so you can check.
 
 ## Use
 
 ```bash
-npx verify-anything "<text>"            # a claim or paragraph (50+ chars)
-npx verify-anything https://example.com # a page
-npx verify-anything report.md           # a file
-pbpaste | npx verify-anything           # whatever's on your clipboard
-npx verify-anything ... --verbose       # every source judged, with entailment / contradiction scores
-npx verify-anything ... --json          # machine-readable; exit code 1 if anything is contradicted
+npx verify-anything@0.2.0 "<text>"            # a claim or paragraph (50+ chars)
+npx verify-anything@0.2.0 https://example.com # a page
+npx verify-anything@0.2.0 report.md           # a text file (up to 50,000 chars)
+pbpaste | npx verify-anything@0.2.0           # whatever's on your clipboard
+npx verify-anything@0.2.0 ... --verbose       # every source judged, with entailment / contradiction scores
+npx verify-anything@0.2.0 ... --json          # machine-readable; exit code 1 if anything is contradicted
 ```
 
-Keyless use is rate-limited. Get a free key at [lastsearch.ai](https://lastsearch.ai) and
+Without a key you get a small demo allowance. Get a free key at [lastsearch.ai](https://lastsearch.ai) and
 `export LASTSEARCH_API_KEY=ls_...`
+
+**Data:** the text, file contents or URL you verify are sent to the LastSearch API and stored as
+described in the [LastSearch Privacy Policy](https://lastsearch.ai/privacy). Don't send secrets or
+personal data. Use is subject to the [LastSearch Terms](https://lastsearch.ai/terms).
 
 ## Give your agent a conscience
 
 ```bash
-npx verify-anything setup        # registers the MCP server with your installed clients
+npx verify-anything@0.2.0 setup              # registers the MCP server with your installed clients
+npx verify-anything@0.2.0 setup --with-key   # also writes $LASTSEARCH_API_KEY into each client config
 ```
+
+`setup` pins the version it writes, backs up each config to `<file>.bak`, leaves files it can't
+parse untouched, and won't replace a different server already named `verify` unless you pass
+`--force`. For Codex CLI: `codex mcp add verify -- npx -y verify-anything@0.2.0 mcp`.
 
 Then: *"Draft the answer, then run verify on it before you show me."*
 
@@ -79,4 +89,14 @@ Verification is only as good as the evidence found and the verifier reading it. 
 and occasionally be wrong; `thorough` (the default) uses the stronger verifier. Treat the output as a
 fast, sourced second opinion — not an oracle.
 
-Apache-2.0 · built on [LastSearch](https://lastsearch.ai) · [report issues](https://github.com/LastSearch-HQ/verify/issues)
+Output is automated and may be wrong or incomplete; it is not professional advice. You (and your
+agent) decide what to rely on.
+
+---
+
+A free, non-commercial passion project by an independent developer, provided "as is" without
+warranty. Copyright 2026 Shreyas Sawant · Apache-2.0 · built on [LastSearch](https://lastsearch.ai) ·
+[report issues](https://github.com/LastSearch-HQ/verify/issues) · [security](SECURITY.md)
+
+Claude, ChatGPT, Cursor, Windsurf, Codex and Gemini are trademarks of their respective owners,
+named only to describe compatibility. Not affiliated with or endorsed by them.
