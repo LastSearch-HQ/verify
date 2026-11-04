@@ -1,5 +1,18 @@
-// Thin client for the LastSearch verification engine. Works keyless (demo
-// rate limit) and better with a free key: LASTSEARCH_API_KEY=ls_...
+// Thin client for the LastSearch verification API. Works keyless (small demo
+// allowance) and better with a free key: LASTSEARCH_API_KEY=ls_...
+import { VERSION } from "./version.js";
+
+/** Base URL must be https, or http only for a loopback host. */
+export function checkApiUrl(raw: string): string {
+  let u: URL;
+  try { u = new URL(raw); } catch { throw new Error(`LASTSEARCH_API_URL is not a valid URL`); }
+  const loopback = ["localhost", "127.0.0.1", "[::1]"].includes(u.hostname);
+  if (u.protocol !== "https:" && !(u.protocol === "http:" && loopback)) {
+    throw new Error(`LASTSEARCH_API_URL must use https:// (http:// is allowed only for localhost)`);
+  }
+  return raw.replace(/\/+$/, "");
+}
+
 export const API = process.env.LASTSEARCH_API_URL || "https://api.lastsearch.ai/api";
 const KEY = process.env.LASTSEARCH_API_KEY;
 
@@ -9,14 +22,15 @@ export interface VerifiedClaim { text: string; status: ClaimStatus; confidence: 
 export interface VerifyResult { summary: { verified: number; contradicted: number; unverified: number; total: number; overallConfidence?: number; [k: string]: unknown }; claims: VerifiedClaim[]; documentLength: number; durationMs: number; }
 
 async function post<T>(path: string, body: unknown): Promise<T> {
-  const res = await fetch(`${API}${path}`, {
+  const base = checkApiUrl(API);
+  const res = await fetch(`${base}${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...(KEY ? { "X-API-Key": KEY } : {}), "User-Agent": "verify-anything" },
+    headers: { "Content-Type": "application/json", ...(KEY ? { "X-API-Key": KEY } : {}), "User-Agent": `verify-anything/${VERSION}` },
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(180_000),
   });
   const data = (await res.json().catch(() => ({}))) as { success?: boolean; result?: T; error?: string };
-  if (res.status === 429) throw new Error(`Rate limited. Keyless use is limited; get a free key at https://lastsearch.ai and set LASTSEARCH_API_KEY.`);
+  if (res.status === 429) throw new Error(`Rate limited. Keyless use has a small demo allowance; get a free key at https://lastsearch.ai and set LASTSEARCH_API_KEY.`);
   if (!res.ok || !data.success || !data.result) throw new Error(data.error || `API error ${res.status}`);
   return data.result;
 }

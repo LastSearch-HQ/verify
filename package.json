@@ -1,7 +1,7 @@
 {
   "name": "verify-anything",
-  "version": "0.1.0",
-  "description": "Is this true? Verify any claim, URL, file, or AI answer \u2014 every claim judged against live sources, with confidence, the exact evidence span, and the reason. CLI + MCP server.",
+  "version": "0.2.0",
+  "description": "Is this true? Verify a claim, URL, file, or AI answer: up to 20 claims (configurable) judged against web sources, with confidence, the evidence span, and the reason. CLI + MCP server.",
   "type": "module",
   "bin": {
     "verify": "dist/cli.js"
@@ -10,11 +10,13 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "NOTICE"
   ],
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/cli.ts",
+    "test": "NO_COLOR=1 node --import tsx --test tests/*.test.ts",
     "prepublishOnly": "npm run build"
   },
   "engines": {
@@ -29,15 +31,12 @@
     "hallucination",
     "citations",
     "truth",
-    "llm",
-    "claude",
-    "chatgpt",
-    "cursor"
+    "llm"
   ],
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/LastSearch-HQ/verify.git"
+    "url": "git+https://github.com/LastSearch-HQ/verify.git"
   },
   "homepage": "https://lastsearch.ai",
   "dependencies": {

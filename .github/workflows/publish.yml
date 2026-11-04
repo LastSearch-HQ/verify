@@ -1,0 +1,47 @@
+name: Publish
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions: {}
+concurrency: { group: publish, cancel-in-progress: false }
+jobs:
+  publish:
+    # Turned on by setting the repo variable NPM_TRUSTED_PUBLISHING=true once a
+    # Trusted Publisher for this workflow is configured on npmjs.com.
+    if: vars.NPM_TRUSTED_PUBLISHING == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # npm trusted publishing (OIDC); provenance is automatic
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - name: Skip if this version is already on npm
+        id: check
+        run: |
+          v=$(node -p "require('./package.json').version")
+          if npm view "verify-anything@$v" version >/dev/null 2>&1; then
+            echo "verify-anything@$v is already published; nothing to do."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.check.outputs.publish == 'true'
+        run: npm install -g npm@11
+      - if: steps.check.outputs.publish == 'true'
+        run: npm ci
+      - if: steps.check.outputs.publish == 'true'
+        run: npm test
+      - if: steps.check.outputs.publish == 'true'
+        name: Publish (needs a trusted publisher configured on npmjs.com)
+        run: |
+          npm publish --access public || {
+            echo "::error::npm publish failed. Check the Trusted Publisher on npmjs.com (package verify-anything → Settings → Trusted publishing: GitHub Actions, LastSearch-HQ/verify, workflow publish.yml)."
+            exit 1
+          }
